@@ -22,7 +22,6 @@ BasicGame.MainMenu.prototype = {
 		//this.music.play();
 
 		//this.add.sprite(0, 0, 'titlepage');
-		console.log(this.score);
 	},
 
 	update: function () {

@@ -1,15 +1,16 @@
 {
 	"easy": [
 		{
-			"dialogue":"HALT THIEF!",
-			"response":"Hah! As if I'll stop so easily.",
-			"result":"FIRE THE NONLETHAL BULLETS",
-			"function":"fireBullets()"
+			"dialogue":"HALT THIEF! You're under arrest for unlawful entry and theft!",
+			"response":"Ouch those sirens and megaphones are sure going to take a toll on my lovely ears."
 		},
 		{
-			"dialogue":"am I doing this right?",
-			"response":"I don't know Ii'm just tired.",
-			"result":"FfckflaTS"
+			"dialogue":"Officers, don't let that woman get away!",
+			"response":"Well I hope your buddies are good with heights~"
+		},
+		{
+			"dialogue":"HALT THIEF! You're under arrest for unlawful entry and theft!",
+			"response":"Ouch those sirens and megaphones are sure going to take a toll on my lovely ears."
 		}
 	]
 }
