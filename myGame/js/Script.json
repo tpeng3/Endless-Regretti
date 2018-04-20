@@ -1,0 +1,15 @@
+{
+	"easy": [
+		{
+			"dialogue":"HALT THIEF!",
+			"response":"Hah! As if I'll stop so easily.",
+			"result":"FIRE THE NONLETHAL BULLETS",
+			"function":"fireBullets()"
+		},
+		{
+			"dialogue":"am I doing this right?",
+			"response":"I don't know Ii'm just tired.",
+			"result":"FfckflaTS"
+		}
+	]
+}
