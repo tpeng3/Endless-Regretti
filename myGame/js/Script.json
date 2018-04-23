@@ -1,16 +1,24 @@
 {
-	"easy": [
+	"requirements":[10, 100, 250, 500, 1000, 2500, 5000, 7500, 10000],
+	"one": [
 		{
 			"dialogue":"HALT THIEF! You're under arrest for unlawful entry and theft!",
 			"response":"Ouch those sirens and megaphones are sure going to take a toll on my lovely ears."
 		},
 		{
-			"dialogue":"Officers, don't let that woman get away!",
-			"response":"Well I hope your buddies are good with heights~"
+			"dialogue":"OFFICERS! Don't let the thief get away!",
+			"response":"Try not to hurt yourself, sweetie."
 		},
 		{
 			"dialogue":"HALT THIEF! You're under arrest for unlawful entry and theft!",
 			"response":"Ouch those sirens and megaphones are sure going to take a toll on my lovely ears."
 		}
-	]
+	],
+	"two":[
+		{
+			"dialogue":"Give us back what you stole!",
+			"response":"Are you talking about your heart?",
+			"result":"wH- WH- NO! The artwork!"
+
+		}]
 }
