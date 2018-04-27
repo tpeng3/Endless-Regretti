@@ -14,7 +14,7 @@ BasicGame.GameOver.prototype = {
 		console.log('GameOver: create');
 		this.stage.backgroundColor = "#000";
 
-		var rip = this.add.sprite(this.world.centerX, 0, 'rip');
+		var rip = this.add.sprite(this.world.centerX, 0, 'key', 'gameover');
 		rip.anchor.setTo(0.5, 0);
 		rip.alpha = 0;
 		this.game.add.tween(rip).to( { alpha: 1 }, 2000, Phaser.Easing.Linear.None, true);
@@ -27,11 +27,11 @@ BasicGame.GameOver.prototype = {
         var textB = this.add.bitmapText(this.world.centerX, 500, 'btmfont', 'Press ENTER to try again!', 24);
         textB.anchor.setTo(0.5);
         textB.visible = false;
-        this.time.events.add(3000, function(){textB.visible = true}, this);
+        this.time.events.add(2000, function(){textB.visible = true}, this);
 
         var textC = this.add.bitmapText(10, 570, 'btmfont', 'Press Z to show/hide credits', 20);
         textC.visible = false;
-        this.time.events.add(5000, function(){textC.visible = true}, this);
+        this.time.events.add(4000, function(){textC.visible = true}, this);
 	},
 
 	update: function () {

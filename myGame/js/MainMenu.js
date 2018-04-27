@@ -2,8 +2,6 @@
 var BasicGame = {};
 
 BasicGame.MainMenu = function (game) {
-	this.music = null;
-	this.playButton = null;
 };
 
 BasicGame.MainMenu.prototype = {
@@ -15,17 +13,12 @@ BasicGame.MainMenu.prototype = {
 		this.load.audio('siren', 'assets/audio/siren.ogg');
 
 		// preload assets
-        // also I need to use an atlas later
-        this.load.atlas('key', 'assets/img/tempatlas.png', 'assets/img/tempatlas.json');
+        this.load.atlas('key', 'assets/img/spritesheet.png', 'assets/img/sprites.json');
         this.load.image('block', 'assets/img/block.png');
-        this.load.image('bullet', 'assets/img/temp_bullet.png');
-        this.load.image('temp_sky', 'assets/img/temp_sky.png');
-        this.load.image('buildings', 'assets/img/buildings.png')
 
         this.load.image('sydney', 'assets/img/sydney_sprite.png');
-        this.load.image('ravennas', 'assets/img/ravenna_sprite.png');
-        this.load.spritesheet('ravenna', 'assets/img/ravennasprite.png', 64, 64);
-        this.load.spritesheet('baddie', 'assets/img/baddie.png', 32, 32);
+        this.load.image('ravenna', 'assets/img/ravenna_sprite.png');
+        this.load.spritesheet('player', 'assets/img/player.png', 64, 64);
         this.load.image('textbox', 'assets/img/textbox.png');
         this.load.text('script', 'js/Script.json');
         this.load.bitmapFont('btmfont', 'assets/img/font.png', 'assets/img/font.fnt');
@@ -33,7 +26,7 @@ BasicGame.MainMenu.prototype = {
 
 	create: function() {
 		// Load the background
-		this.add.sprite(0, 0, 'instructions');
+		this.add.sprite(0, 0, 'key', 'instructions');
 
 		this.add.bitmapText(200, 500, 'btmfont', 'Press ENTER to start escaping', 24);
 

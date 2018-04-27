@@ -3,13 +3,10 @@ BasicGame.GamePlay = function (game) {};
 
 BasicGame.GamePlay.prototype = {
     preload: function() {
-        console.log('GamePlay: preload');
         this.time.advancedTiming = true;
     },
 
     create: function () {
-        console.log('GamePlay: create');
-
         // Define player movement constants
         this.MAX_SPEED = 300; //500; // pixels/second
         this.ACCELERATION = 700; //1500; // pixels/second/second
@@ -35,8 +32,8 @@ BasicGame.GamePlay.prototype = {
         this.physics.startSystem(Phaser.Physics.ARCADE);
 
         // Add backgrounds (as a tileSprite so it can loop)
-        this.sky = this.add.tileSprite(0, 0, this.world.width, this.world.height, 'temp_sky');
-        this.buildings = this.add.tileSprite(0,0,this.world.width, this.world.height, 'buildings');
+        this.sky = this.add.tileSprite(0, 0, this.world.width, this.world.height, 'key', 'sky');
+        this.buildings = this.add.tileSprite(0,0,this.world.width, this.world.height, 'key', 'buildings');
 
         // Create the platforms group
         this.platforms = this.add.group();
@@ -65,17 +62,21 @@ BasicGame.GamePlay.prototype = {
         // Set the initial score
         this.scoreTick = this.game.time.now;
         score = 0;
-        scoreText = this.add.bitmapText(16, 16, 'btmfont', 'score: 0', 24);
+        this.scoreText = this.add.bitmapText(16, 16, 'btmfont', 'score: 0', 24);
+
+        // Play music
+        this.music = this.add.audio('music');
+        this.music.play();
 
         // load the script
         this.script = JSON.parse(this.game.cache.getText('script'));
 
         this.sydney = this.add.sprite(0, 0, 'sydney');
         this.sydney.visible = false;
-        this.ravenna = this.add.sprite(0, 0, 'ravennas');
+        this.ravenna = this.add.sprite(0, 0, 'ravenna');
         this.ravenna.visible = false;
         // place the textbox (but keep it hidden)
-        this.textbox = this.add.sprite(25, 475, 'textbox');
+        this.textbox = this.add.sprite(25, 475, 'key', 'textbox');
         this.textbox.visible = false;
         // initialize the text
         this.btmText = this.add.bitmapText(200, 500, 'btmfont', "", 24); // 24 is the fontSize
@@ -102,10 +103,12 @@ BasicGame.GamePlay.prototype = {
 
         // check for if player falls off the buildings
         if(player.y > this.world.height - 50 || this.input.keyboard.isDown(Phaser.Keyboard.ENTER)){
+            this.music.stop();
             this.state.start('GameOver');
         }
         // if player gets caught by the popo
         if(player.x < 0){
+            this.music.stop();
             this.state.start('GameOver');
         }
         // check for death by bullets
@@ -117,8 +120,10 @@ BasicGame.GamePlay.prototype = {
                 var bullet = this.bullets.getChildAt(i);
                 if(bullet.x > minx && bullet.x < maxx){
                     if(bullet.y > miny && bullet.y <maxy){
-                        if(this.physics.arcade.collide(player, bullet))
+                        if(this.physics.arcade.collide(player, bullet)){
+                            this.music.stop();
                             this.state.start('GameOver');
+                        }
                     }
                 }
             }
@@ -146,7 +151,7 @@ BasicGame.GamePlay.prototype = {
         // Update score with each passing time you're still alive
         if(this.game.time.now - this.scoreTick > this.SCORE_TICK){            
             score += 1;
-            scoreText.text = 'Score: ' + score;
+            this.scoreText.text = 'Score: ' + score;
             this.scoreTick = this.game.time.now;
         }
 
@@ -170,8 +175,7 @@ BasicGame.GamePlay.prototype = {
         }
     },
     createPlayer: function(){
-        // Right now, it's baddie but we'll change this later
-        player = this.add.sprite(300, this.world.height/2, 'ravenna');
+        player = this.add.sprite(300, this.world.height/2, 'player');
         // Enable physics on the player
         this.physics.arcade.enable(player);
         player.body.setSize(28, 44, 18, 17);
@@ -243,7 +247,7 @@ BasicGame.GamePlay.prototype = {
     createLight: function(){
         // This code is referenced from phaser.io "firestarter particles"
         this.emitter = this.add.emitter(this.world.centerX, this.world.centerY, 400);
-        this.emitter.makeParticles('key', '10light');
+        this.emitter.makeParticles('key', 'light');
         this.emitter.gravity = -50;
         this.emitter.setAlpha(1, 0, 500);
         this.emitter.setScale(0.8, .3, 0.8, .3, 800);
@@ -309,16 +313,18 @@ BasicGame.GamePlay.prototype = {
             // else clear textbox and end conversation
             }else{
                 this.textRun = true;
-                this.time.events.add(this.TEXTBOX_TIME, function(){
-                    this.textbox.visible = false;
-                    this.btmText.text = "";
-                    // evaluate the function from the dialogue if there is one
-                    if(line.function != undefined && this.function == false){
-                        eval(line.function);
+                if(this.function == false){
+                    this.time.events.add(this.TEXTBOX_TIME, function(){
+                        this.textbox.visible = false;
+                        this.btmText.text = "";
+                        // evaluate the function from the dialogue if there is one
+                        if(line.function != undefined){
+                            eval(line.function);
+                        }
                         this.function = true;
-                    }
-                    this.textRun = false;
-                }, this);
+                        this.textRun = false;
+                    }, this);
+                }
             }
             // show sprites
             this.ravenna.visible = (line.sprite == "ravenna"? true : false);
@@ -328,7 +334,6 @@ BasicGame.GamePlay.prototype = {
             this.ravenna.visible = false;
             this.sydney.visible = false;
         }
-
     },
 
     fireBullets: function(){
@@ -347,7 +352,7 @@ BasicGame.GamePlay.prototype = {
                         y = Math.floor(Math.random() * 400);
                     }
                 }
-                var bullet = this.add.sprite(x - 200, y, 'bullet');
+                var bullet = this.add.sprite(x - 200, y, 'key', 'bullet');
                 this.game.physics.arcade.enable(bullet);
                 bullet.body.velocity.x = 500;               
                 this.bullets.add(bullet);
