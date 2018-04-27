@@ -27,23 +27,27 @@ BasicGame.GamePlay.prototype = {
     create: function () {
         console.log('GamePlay: create');
 
-        // Define movement constants
+        // Define player movement constants
         this.MAX_SPEED = 300; //500; // pixels/second
         this.ACCELERATION = 700; //1500; // pixels/second/second
         this.DRAG = 650; //600; // pixels/second
         this.GRAVITY = 2500; //2600; // pixels/second/second
         this.JUMP_SPEED = -650; //-700 // pixels/second (negative y is up)
-        // Define some other constants
+        // Define platform constants
         this.INIT_GROUND = 30; // initial amount of ground blocks to generate
         this.INIT_HEIGHT = 4; // average height of blocks
-        this.WALL_VELOCITY = -250; // speed at which the blocks fly at you
-        this.BROAD_SWEEP = 100; // board sweep value for collision checking
-        this.SCORE_GOAL = 200; // initial score goal
+        this.WALL_VELOCITY = -250; // initial speed at which the blocks fly at you
+        // Define score constants
+        this.SCORE_GOAL = 1000; // initial score goal
         this.SCORE_TICK = 50; // how often the score updates
+        // Define text related constants
         this.DIALOGUE_TICK = 20; // dialogue unfolding speed
+        this.TEXTBOX_TIME = 5000; // how long the textbox stays
+        // Define bullet constants
+        this.BULLET_INTERVAL = 1000; // time between bullets fired
         this.NUM_BULLETS = 3; // initial bullet number
-        this.BULLET_VELOCITY = 500; // initial bullet speed
-
+        this.BROAD_SWEEP = 100; // board sweep value for collision checking, for bullets
+    
         // Start up arcade physics
         this.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -101,16 +105,9 @@ BasicGame.GamePlay.prototype = {
         this.game.time.events.add(1000, function(){this.textbox.visible = true, this.textRun = true}, this);
         this.game.time.events.loop(this.DIALOGUE_TICK, this.unfoldDialogue, this, textKey, textLine, charNum);
 
-        // start the dialogue timer (to make that text unfolding effect)
-        this.dialogueTick = this.game.time.now;
-
-        // Ready some key input booleans
-        this.keyW = this.input.keyboard.isDown(Phaser.Keyboard.W);
-        this.keyA = this.input.keyboard.isDown(Phaser.Keyboard.A);
-        this.keyS = this.input.keyboard.isDown(Phaser.Keyboard.S);
-        this.keyD = this.input.keyboard.isDown(Phaser.Keyboard.D);
-        this.keyQ = this.input.keyboard.isDown(Phaser.Keyboard.Q);
-        this.keyE = this.input.keyboard.isDown(Phaser.Keyboard.E);
+        // Fire the bullets
+        // This feels like a janky way to do it but it's better than leaving everything in update
+        this.game.time.events.loop(this.BULLET_INTERVAL, this.fireBullets, this, this.NUM_BULLETS);
     },
 
     update: function () {
@@ -171,24 +168,24 @@ BasicGame.GamePlay.prototype = {
 
         // Check for dialogue that you can unlock
         //Else check if it's time to play a dialogue
-        if(score > this.SCORE_GOAL &&
-            this.textbox.visible == false){
-            this.textRun = true;
-            textKey = Math.floor(Math.random() * this.script.length);
+        if(this.textbox.visible == false){
+            // reverse the order later
+            if(score > 100){
+                textKey = Math.floor(Math.random() * this.script.length);
+            }else if(score > 400){
+                textKey = 2;
+            }else if(score > 800){
+                textKey = 3;
+            }else if(score > this.SCORE_GOAL){
+                textKey = Math.floor(Math.random() * this.script.length - 4) + 4; // to account for scripted dialogues
+                this.SCORE_GOAL = Math.floor(this.SCORE_GOAL + (Math.log(20*this.SCORE_GOAL) * 50));
+                console.log(this.SCORE_GOAL);
+            }
             textLine = 0;
             charNum = 0;
             this.textbox.visible = true;
-            this.SCORE_GOAL = Math.floor(this.SCORE_GOAL + (Math.log(40*this.SCORE_GOAL) * 20));
-            console.log(this.SCORE_GOAL);
+            this.textRun = true;
         }
-
-        // We're firing bullets every 100 points
-        // Changed later to match with events
-        // if(score%100 == 0 && this.shoot != Math.floor(score/100)){
-        //     this.shoot++;
-        //     this.fireBullets(this.NUM_BULLETS, this.BULLET_VELOCITY); // number of bullets and fly speed
-        // }
-
     },
     createPlayer: function(){
         // Right now, it's baddie but we'll change this later
@@ -313,58 +310,63 @@ BasicGame.GamePlay.prototype = {
         // variables: textKey, textLine, charNum
         // oh my god there's so many variables im sorry this is such ugly code im kermitting
         if(this.textbox.visible == true && this.textRun == true){
-            var dialogue = this.script[textKey][textLine].dialogue;
-            if(this.script[textKey][textLine].sprite == "sydney"){
-                this.sydney.visible = true;
-            }else{
-                this.sydney.visible = false;
-            }
-            if(this.script[textKey][textLine].sprite == "ravenna"){
-                this.ravenna.visible = true;
-            }else{
-                this.ravenna.visible = false;
-            }
-            if(dialogue[charNum] != undefined){
-                this.btmText.text += dialogue[charNum];
+            var line = this.script[textKey][textLine];
+            // show sprites
+            this.ravenna.visible = (line.sprite == "ravenna"? true : false);
+            this.sydney.visible = (line.sprite == "sydney"? true : false);
+            // show dialogue text
+            if(line.dialogue[charNum] != undefined){
+                this.btmText.text += line.dialogue[charNum];
                 charNum++;
+            // if there are more lines to read in a conversation
             }else if(this.script[textKey][textLine+1] != undefined){
                 this.textRun = false;
-                this.time.events.add(5000, function(){
+                this.time.events.add(this.TEXTBOX_TIME, function(){
                     textLine++;
                     charNum = 0;
                     this.btmText.text = "";  
                     this.textRun = true;
                 }, this);
+            // else clear textbox and end conversation
             }else{
                 this.textRun = true;
-                this.time.events.add(2000, function(){
+                this.time.events.add(this.TEXTBOX_TIME, function(){
                     this.textbox.visible = false;
+                    this.ravenna.visible = false;
+                    this.sydney.visible = false;
                     this.btmText.text = "";
+                    // evaluate the function from the dialogue if there is one
+                    if(line.function != undefined){
+                        eval(line.function);
+                    }
                     this.textRun = false;
                 }, this);
             }
         }
     },
 
-    fireBullets: function(NUM_BULLETS, BULLET_VELOCITY){
-        // Remove previous bullets
-        this.bullets.removeAll();
-        for(var i=0; i<NUM_BULLETS; i++){
-            //Randomly generate some bullets
-            var x = Math.floor(Math.random() * 200);
-            var y = Math.floor(Math.random() * 400);
-            // Check if x,y coordinates will interfere with previous bullets
-            // for(var j=0; j<this.bullets.children.length; j++){
-            //     if(Math.abs(x - this.bullets.getChildAt(j).x) > 5 && Math.abs(y - this.bullets.getChildAt(j).y) > 5){
-            //         console.log("overlapping bullet");
-            //         x = 0;
-            //         y = player.y;
-            //     }
-            // }
-            var bullet = this.add.sprite(x - 200, y, 'bullet');
-            this.game.physics.arcade.enable(bullet);
-            bullet.body.velocity.x = BULLET_VELOCITY;               
-            this.bullets.add(bullet);
+    fireBullets: function(){
+        if (this.firing == true && this.textbox.visible == false){ // sydney doesn't shoot when she's talking, she's not evil
+            // Remove previous bullets
+            this.bullets.removeAll();
+            for(var i=0; i<NUM_BULLETS; i++){
+                //Randomly generate some bullets
+                var x = Math.floor(Math.random() * 200);
+                var y = Math.floor(Math.random() * 400);
+                // Check if x,y coordinates will interfere with previous bullets
+                for(var j=0; j<this.bullets.children.length; j++){
+                    if(Math.abs(x - this.bullets.getChildAt(j).x) > 5 && Math.abs(y - this.bullets.getChildAt(j).y) > 5){
+                        console.log("overlapping bullet");
+                        x = 0;
+                        y = player.y;
+                        console.log("what is y " + y);
+                    }
+                }
+                var bullet = this.add.sprite(x - 200, y, 'bullet');
+                this.game.physics.arcade.enable(bullet);
+                bullet.body.velocity.x = BULLET_VELOCITY;               
+                this.bullets.add(bullet);
+            }
         }
     },
 }
