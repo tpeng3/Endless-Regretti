@@ -7,11 +7,10 @@ BasicGame.GameOver = function (game) {
 BasicGame.GameOver.prototype = {
 	preload: function() {
 		console.log('GameOver: preload');
-		this.load.image('rip', 'assets/img/gameover.png');
+		this.load.image('credits', 'assets/img/credits.png');
 	},
 
 	create: function() {
-		console.log('GameOver: create');
 		this.stage.backgroundColor = "#000";
 
 		var rip = this.add.sprite(this.world.centerX, 0, 'key', 'gameover');
@@ -32,6 +31,10 @@ BasicGame.GameOver.prototype = {
         var textC = this.add.bitmapText(10, 570, 'btmfont', 'Press Z to show/hide credits', 20);
         textC.visible = false;
         this.time.events.add(4000, function(){textC.visible = true}, this);
+
+        // Ok I'm lazy and running out of time so I'm just going make this an image, not text
+        this.credits = this.add.sprite(0, 0, 'credits');
+        this.credits.visible = false;
 	},
 
 	update: function () {
@@ -41,8 +44,8 @@ BasicGame.GameOver.prototype = {
 		}
 
 		// show/hide credits
-		if(this.input.keyboard.isDown(Phaser.Keyboard.Z)){
-			//if()
+		if(this.input.keyboard.justPressed(Phaser.Keyboard.Z)){
+			this.credits.visible = (this.credits.visible == true? false : true);
 		}
 	}
 };

@@ -156,13 +156,12 @@ BasicGame.GamePlay.prototype = {
         }
 
         // Check for dialogue that you can unlock
-        //Else check if it's time to play a dialogue
+        // If I had more time I would have added more depth to these lines but well... rip
         if(this.textbox.visible == false && score > this.SCORE_GOAL){
-            // reverse the order later
             if(score > 400 && textKey < 2){
+                textKey = 2;
+            }else if(score > 800 && textKey < 3){
                 textKey = 3;
-            }else if(score > 800 && textKey < 4){
-                textKey = 5;
             }else{
                 textKey = Math.floor(Math.random() * this.script.length - 4) + 4; // to account for scripted dialogues
             }
@@ -365,5 +364,12 @@ BasicGame.GamePlay.prototype = {
             this.platforms.getChildAt(i).body.velocity.x -= 50;
         }
         this.WALL_VELOCITY -= 50;
+    },
+
+    slowdownWall: function(){
+        for(var i=0; i<this.platforms.children.length; i++){
+            this.platforms.getChildAt(i).body.velocity.x += 100;
+        }
+        this.WALL_VELOCITY += 100;
     }
 }
