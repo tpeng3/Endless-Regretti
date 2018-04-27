@@ -33,7 +33,7 @@
 		{"sprite":"sydney", "dialogue":"You can't outrun justice!"},
 		{"sprite":"ravenna","dialogue":"Really? I've been doing a pretty good job so far."},
 		{"sprite":"sydney", "dialogue":"CALLING NEARBY POLICE CARS! Check ahead and make sure to block all exits!"},
-		{"sprite":"ravenna","dialogue":"I guess I should stop strolling around.", "function":"this.WALL_VELOCITY-=50;"}
+		{"sprite":"ravenna","dialogue":"I guess I should stop strolling around.", "function":"this.speedupWall();"}
 	],
 	[
 		{"sprite":"sydney", "dialogue":"W-what? There's a traffic accident on 12th Avenue?"},
@@ -56,13 +56,13 @@
 	[
 		{"sprite":"sydney", "dialogue":"You're never going to escape!!"},
 		{"sprite":"ravenna","dialogue":"Save the sweet talk for the bedroom, honey."},
-		{"sprite":"ravenna","dialogue":"...Haha she's running faster now, I better speed up too.", "function":"this.WALL_VELOCITY-=50;"}
+		{"sprite":"ravenna","dialogue":"...Haha she's running faster now, I better speed up too.", "function":"this.speedupWall();"}
 	],
 	[
 		{"sprite":"sydney", "dialogue":"When I get my hands on you..."},
 		{"sprite":"ravenna", "dialogue":"Oh Officer, what are you going to do to me?"},
 		{"sprite":"sydney", "dialogue":"GH- JUST YOU WAIT."},
-		{"sprite":"ravenna","dialogue":"Too bad waiting's my not specialty.", "function":"this.WALL_VELOCITY-=50;"}
+		{"sprite":"ravenna","dialogue":"Too bad waiting's my not specialty.", "function":"this.speedupWall();"}
 	],
 	[
 		{"sprite":"sydney", "dialogue":"Reinforcements are coming!"},
@@ -74,7 +74,7 @@
 		{"sprite":"sydney", "dialogue":"I'm not going to give up!"},
 		{"sprite":"ravenna","dialogue":"Well stubborness is a part of your charm."},
 		{"sprite":"sydney", "dialogue":"H-huh?"},
-		{"dialogue":"(Sydney is caught off guard and slows down!)", "function":"this.WALL_VELOCITY-+=50;"}
+		{"dialogue":"(Sydney is caught off guard and slows down!)", "function":"this.speedupWall();"}
 	],
 	[
 		{"sprite":"sydney", "dialogue":"What's it going to take for you to give up?"},

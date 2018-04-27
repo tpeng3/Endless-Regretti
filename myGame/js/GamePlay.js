@@ -5,23 +5,6 @@ BasicGame.GamePlay.prototype = {
     preload: function() {
         console.log('GamePlay: preload');
         this.time.advancedTiming = true;
-
-        // preload assets
-        // right now these are all temp imgs until I get my butt off to draw stuff
-        // also I need to use an atlas later
-        this.load.atlas('key', 'assets/img/tempatlas.png', 'assets/img/tempatlas.json');
-        this.load.image('block', 'assets/img/block.png');
-        this.load.image('bullet', 'assets/img/temp_bullet.png');
-        this.load.image('temp_sky', 'assets/img/temp_sky.png');
-        this.load.image('buildings', 'assets/img/buildings.png')
-
-        this.load.image('sydney', 'assets/img/sydney_sprite.png');
-        this.load.image('ravennas', 'assets/img/ravenna_sprite.png');
-        this.load.spritesheet('ravenna', 'assets/img/ravennasprite.png', 64, 64);
-        this.load.spritesheet('baddie', 'assets/img/baddie.png', 32, 32);
-        this.load.image('textbox', 'assets/img/textbox.png');
-        this.load.text('script', 'js/Script.json');
-        this.load.bitmapFont('btmfont', 'assets/img/font.png', 'assets/img/font.fnt');
     },
 
     create: function () {
@@ -35,16 +18,16 @@ BasicGame.GamePlay.prototype = {
         this.JUMP_SPEED = -650; //-700 // pixels/second (negative y is up)
         // Define platform constants
         this.INIT_GROUND = 30; // initial amount of ground blocks to generate
-        this.INIT_HEIGHT = 4; // average height of blocks
+        this.INIT_HEIGHT = 3; // average height of blocks
         this.WALL_VELOCITY = -250; // initial speed at which the blocks fly at you
         // Define score constants
-        this.SCORE_GOAL = 1000; // initial score goal
+        this.SCORE_GOAL = 400; // initial score goal
         this.SCORE_TICK = 50; // how often the score updates
         // Define text related constants
         this.DIALOGUE_TICK = 20; // dialogue unfolding speed
-        this.TEXTBOX_TIME = 5000; // how long the textbox stays
+        this.TEXTBOX_TIME = 4000; // how long the textbox stays
         // Define bullet constants
-        this.BULLET_INTERVAL = 1000; // time between bullets fired
+        this.BULLET_INTERVAL = 3000; // time between bullets fired
         this.NUM_BULLETS = 3; // initial bullet number
         this.BROAD_SWEEP = 100; // board sweep value for collision checking, for bullets
     
@@ -76,11 +59,13 @@ BasicGame.GamePlay.prototype = {
         this.createPlayer();
         // Start a particle emitter, for a cool fancy effect
         this.createLight();
+        // Position sprite as on top (so that it's above the light particles)
+        this.world.moveUp(player);
     
         // Set the initial score
         this.scoreTick = this.game.time.now;
         score = 0;
-        scoreText = this.add.text(16, 16, 'score: 0', {fontSize: '24px', fill: "#fff"});
+        scoreText = this.add.bitmapText(16, 16, 'btmfont', 'score: 0', 24);
 
         // load the script
         this.script = JSON.parse(this.game.cache.getText('script'));
@@ -97,6 +82,8 @@ BasicGame.GamePlay.prototype = {
         this.btmText.maxWidth = 800;
         this.game.cache.getBitmapFont('btmfont').font.lineHeight = 30; // change line spacing in a more roundabout way
 
+        this.world.moveUp(this.sydney);
+        this.world.moveUp(this.ravenna);
         // Start the first dialogue event
         textKey = Math.round(Math.random()); // start the script from either 0 or 1
         textLine = 0;
@@ -106,7 +93,6 @@ BasicGame.GamePlay.prototype = {
         this.game.time.events.loop(this.DIALOGUE_TICK, this.unfoldDialogue, this, textKey, textLine, charNum);
 
         // Fire the bullets
-        // This feels like a janky way to do it but it's better than leaving everything in update
         this.game.time.events.loop(this.BULLET_INTERVAL, this.fireBullets, this, this.NUM_BULLETS);
     },
 
@@ -143,8 +129,8 @@ BasicGame.GamePlay.prototype = {
         this.buildings.tilePosition.x -=1;
 
         // Update with incoming platforms, aka city buildings
-        if(this.platforms.getChildAt(12).x < 0){
-            for(var i=0; i<12; i++){
+        if(this.platforms.getChildAt(15).x < 0){
+            for(var i=0; i<15; i++){
                 this.platforms.remove(this.platforms.getChildAt(0)); // remove the old ones off screen
             }
             this.makeBlocks();
@@ -154,8 +140,6 @@ BasicGame.GamePlay.prototype = {
         this.hitPlatform = this.physics.arcade.collide(player, this.platforms);
         // Update player movement and animation
         this.updatePlayer();
-        // Position sprite as on top (so that it's above the light particles)
-        this.world.moveUp(player);
         // Update light emitter particles
         this.updateLight();
 
@@ -168,23 +152,21 @@ BasicGame.GamePlay.prototype = {
 
         // Check for dialogue that you can unlock
         //Else check if it's time to play a dialogue
-        if(this.textbox.visible == false){
+        if(this.textbox.visible == false && score > this.SCORE_GOAL){
             // reverse the order later
-            if(score > 100){
-                textKey = Math.floor(Math.random() * this.script.length);
-            }else if(score > 400){
-                textKey = 2;
-            }else if(score > 800){
+            if(score > 400 && textKey < 2){
                 textKey = 3;
-            }else if(score > this.SCORE_GOAL){
+            }else if(score > 800 && textKey < 4){
+                textKey = 5;
+            }else{
                 textKey = Math.floor(Math.random() * this.script.length - 4) + 4; // to account for scripted dialogues
-                this.SCORE_GOAL = Math.floor(this.SCORE_GOAL + (Math.log(20*this.SCORE_GOAL) * 50));
-                console.log(this.SCORE_GOAL);
             }
+            this.SCORE_GOAL = Math.floor(this.SCORE_GOAL + (Math.log(20*this.SCORE_GOAL) * 50));
             textLine = 0;
             charNum = 0;
             this.textbox.visible = true;
             this.textRun = true;
+            this.function = false;
         }
     },
     createPlayer: function(){
@@ -284,19 +266,19 @@ BasicGame.GamePlay.prototype = {
     makeBlocks: function(){
         // Randomly generates a block wall
         var heightList = [-1, -1, 0, 0, 1, 2];
-        for(var i=0; i<12; i++){
+        for(var i=0; i<15; i++){
             var wallHeight;
-            var prevHeight = this.platforms.getChildAt(this.platforms.length-1).y;
+            var prevHeight = Math.floor((this.world.height -
+                                         this.platforms.getChildAt(this.platforms.length-1).y) / 64);
             var prob = Math.random();
-            if(prob < .2){
+            if(prob < .05){
                 wallHeight = 0;
-                console.log("hole");
-            }else if(prob < .4 && prevHeight > 2){
-                wallHeight = Math.floor((this.world.height - prevHeight)/50);
+            }else if(prob < .4 && prevHeight >= 2){
+                wallHeight = prevHeight;
             }else{
                 wallHeight = this.INIT_HEIGHT + heightList[Math.floor(Math.random() * heightList.length)];
             }
-            var platform = this.add.sprite(this.world.width + (i * 64), (this.world.height) - (wallHeight * 50), 'block');
+            var platform = this.add.sprite(this.world.width + (i * 64), (this.world.height) - (wallHeight * 64), 'block');
             this.game.physics.arcade.enable(platform);
             platform.body.velocity.x = this.WALL_VELOCITY;
             platform.body.friction.x = 0;
@@ -311,9 +293,6 @@ BasicGame.GamePlay.prototype = {
         // oh my god there's so many variables im sorry this is such ugly code im kermitting
         if(this.textbox.visible == true && this.textRun == true){
             var line = this.script[textKey][textLine];
-            // show sprites
-            this.ravenna.visible = (line.sprite == "ravenna"? true : false);
-            this.sydney.visible = (line.sprite == "sydney"? true : false);
             // show dialogue text
             if(line.dialogue[charNum] != undefined){
                 this.btmText.text += line.dialogue[charNum];
@@ -332,41 +311,54 @@ BasicGame.GamePlay.prototype = {
                 this.textRun = true;
                 this.time.events.add(this.TEXTBOX_TIME, function(){
                     this.textbox.visible = false;
-                    this.ravenna.visible = false;
-                    this.sydney.visible = false;
                     this.btmText.text = "";
                     // evaluate the function from the dialogue if there is one
-                    if(line.function != undefined){
+                    if(line.function != undefined && this.function == false){
                         eval(line.function);
+                        this.function = true;
                     }
                     this.textRun = false;
                 }, this);
             }
+            // show sprites
+            this.ravenna.visible = (line.sprite == "ravenna"? true : false);
+            this.sydney.visible = (line.sprite == "sydney"? true : false);
+        // this is such a janky way to keep sprites hidden I'm sorry
+        }else if(this.textbox.visible == false){
+            this.ravenna.visible = false;
+            this.sydney.visible = false;
         }
+
     },
 
     fireBullets: function(){
-        if (this.firing == true && this.textbox.visible == false){ // sydney doesn't shoot when she's talking, she's not evil
+        // sydney doesn't shoot when she's talking, she's not evil
+        if (this.firing == true && this.textbox.visible == false){ 
             // Remove previous bullets
             this.bullets.removeAll();
-            for(var i=0; i<NUM_BULLETS; i++){
+            for(var i=0; i<this.NUM_BULLETS; i++){
                 //Randomly generate some bullets
                 var x = Math.floor(Math.random() * 200);
                 var y = Math.floor(Math.random() * 400);
                 // Check if x,y coordinates will interfere with previous bullets
                 for(var j=0; j<this.bullets.children.length; j++){
                     if(Math.abs(x - this.bullets.getChildAt(j).x) > 5 && Math.abs(y - this.bullets.getChildAt(j).y) > 5){
-                        console.log("overlapping bullet");
                         x = 0;
-                        y = player.y;
-                        console.log("what is y " + y);
+                        y = Math.floor(Math.random() * 400);
                     }
                 }
                 var bullet = this.add.sprite(x - 200, y, 'bullet');
                 this.game.physics.arcade.enable(bullet);
-                bullet.body.velocity.x = BULLET_VELOCITY;               
+                bullet.body.velocity.x = 500;               
                 this.bullets.add(bullet);
             }
         }
     },
+
+    speedupWall: function(){
+        for(var i=0; i<this.platforms.children.length; i++){
+            this.platforms.getChildAt(i).body.velocity.x -= 50;
+        }
+        this.WALL_VELOCITY -= 50;
+    }
 }

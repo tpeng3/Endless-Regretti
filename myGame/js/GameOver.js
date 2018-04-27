@@ -1,27 +1,25 @@
 
 BasicGame.GameOver = function (game) {
-	//this.music = null;
-	//this.playButton = null;
+	this.music = null;
+	this.playButton = null;
 };
 
 BasicGame.GameOver.prototype = {
 	preload: function() {
 		console.log('GameOver: preload');
+		this.load.image('rip', 'assets/img/gameover.png');
 	},
 
 	create: function() {
-		//	We've already preloaded our assets, so let's kick right into the Main Menu itself.
-		//	Here all we're doing is playing some music and adding a picture and button
-		//	Naturally I expect you to do something significantly better :)
-
-		//this.music = this.add.audio('titleMusic');
-		//this.music.play();
 		console.log('GameOver: create');
-		this.stage.backgroundColor = "#facade";
-		//this.add.sprite(0, 0, 'titlepage');
+		this.stage.backgroundColor = "#000";
 
-		//this.playButton = this.add.button(400, 600, 'playButton', this.startGame, this, 'buttonOver', 'buttonOut', 'buttonOver');
-		this.add.text(10, 10, "You died. Press ENTER to go back to the Main Menu.");
+		var rip = this.add.sprite(this.world.centerX, 0, 'rip');
+		rip.anchor.setTo(0.5, 0);
+
+        var text = this.add.bitmapText(200, 500, 'btmfont', 'GAME OVER', 24);
+        this.add.bitmapText(200, 520, 'btmfont', 'Press ENTER to try again!', 24);
+        this.add.bitmapText(200, 550, 'btmfont', 'Press Z to show/hide credits', 24);
 	},
 
 	update: function () {
@@ -29,7 +27,7 @@ BasicGame.GameOver.prototype = {
 
 		// press ENTER to switch to MainMenu state
 		if(this.input.keyboard.isDown(Phaser.Keyboard.ENTER)){
-			this.state.start('MainMenu');
+			this.state.start('GamePlay');
 		}
 	},
 
