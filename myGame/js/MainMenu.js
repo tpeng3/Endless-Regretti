@@ -46,6 +46,7 @@ BasicGame.MainMenu.prototype = {
 		// press ENTER to proceed to the GamePlay state
 		if(this.input.keyboard.isDown(Phaser.Keyboard.ENTER)){
 			this.state.start('GamePlay');
+			this.siren.destroy();
 		}
 	},
 
@@ -54,7 +55,7 @@ BasicGame.MainMenu.prototype = {
 		if(this.siren.volume > 0){
 			this.siren.volume -= .1;
 		}else{
-			this.siren.stop();
+			this.siren.destroy();
 		}
 	}
 

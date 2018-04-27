@@ -16,27 +16,33 @@ BasicGame.GameOver.prototype = {
 
 		var rip = this.add.sprite(this.world.centerX, 0, 'rip');
 		rip.anchor.setTo(0.5, 0);
+		rip.alpha = 0;
+		this.game.add.tween(rip).to( { alpha: 1 }, 2000, Phaser.Easing.Linear.None, true);
 
-        var text = this.add.bitmapText(200, 500, 'btmfont', 'GAME OVER', 24);
-        this.add.bitmapText(200, 520, 'btmfont', 'Press ENTER to try again!', 24);
-        this.add.bitmapText(200, 550, 'btmfont', 'Press Z to show/hide credits', 24);
+        var textA = this.add.bitmapText(this.world.centerX, 450, 'btmfont', 'G A M E  O V E R', 50);
+        textA.anchor.setTo(0.5);
+        textA.alpha = 0;
+		this.game.add.tween(textA).to( { alpha: 1 }, 2000, Phaser.Easing.Linear.None, true);
+
+        var textB = this.add.bitmapText(this.world.centerX, 500, 'btmfont', 'Press ENTER to try again!', 24);
+        textB.anchor.setTo(0.5);
+        textB.visible = false;
+        this.time.events.add(3000, function(){textB.visible = true}, this);
+
+        var textC = this.add.bitmapText(10, 570, 'btmfont', 'Press Z to show/hide credits', 20);
+        textC.visible = false;
+        this.time.events.add(5000, function(){textC.visible = true}, this);
 	},
 
 	update: function () {
-		//	Do some nice funky main menu effect here
-
-		// press ENTER to switch to MainMenu state
+		// press ENTER to switch to Gameplay state
 		if(this.input.keyboard.isDown(Phaser.Keyboard.ENTER)){
 			this.state.start('GamePlay');
 		}
-	},
 
-    quitGame: function (pointer) {
-    //  Here you should destroy anything you no longer need.
-    //  Stop music, delete sprites, purge caches, free resources, all that good stuff.
-
-    //  Then let's go back to the main menu.
-    //this.state.start('MainMenu');
-    }
-
+		// show/hide credits
+		if(this.input.keyboard.isDown(Phaser.Keyboard.Z)){
+			//if()
+		}
+	}
 };
