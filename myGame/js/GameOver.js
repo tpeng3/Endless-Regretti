@@ -1,12 +1,8 @@
 
-BasicGame.GameOver = function (game) {
-	this.music = null;
-	this.playButton = null;
-};
+BasicGame.GameOver = function (game) {};
 
 BasicGame.GameOver.prototype = {
 	preload: function() {
-		console.log('GameOver: preload');
 		this.load.image('credits', 'assets/img/credits.png');
 	},
 
@@ -35,6 +31,11 @@ BasicGame.GameOver.prototype = {
         var textC = this.add.bitmapText(10, 570, 'btmfont', 'Press Z to show/hide credits', 20);
         textC.visible = false;
         this.time.events.add(4000, function(){textC.visible = true}, this);
+
+        var textD = this.add.bitmapText(this.world.width - 10, 570, 'btmfont', 'LAST SCORE: ' + score, 20);
+        textD.anchor.setTo(1, 0);
+        textD.visible = false;
+        this.time.events.add(4000, function(){textD.visible = true}, this);
 
         // Ok I'm lazy and running out of time so I'm just going make this an image, not text
         this.credits = this.add.sprite(0, 0, 'credits');

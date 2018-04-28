@@ -2,17 +2,15 @@
 BasicGame.GamePlay = function (game) {};
 
 BasicGame.GamePlay.prototype = {
-    preload: function() {
-        this.time.advancedTiming = true;
-    },
+    preload: function() {},
 
     create: function () {
         // Define player movement constants
-        this.MAX_SPEED = 300; //500; // pixels/second
-        this.ACCELERATION = 700; //1500; // pixels/second/second
-        this.DRAG = 650; //600; // pixels/second
-        this.GRAVITY = 2500; //2600; // pixels/second/second
-        this.JUMP_SPEED = -650; //-700 // pixels/second (negative y is up)
+        this.MAX_SPEED = 300; // pixels/second
+        this.ACCELERATION = 700; // pixels/second/second
+        this.DRAG = 650; // pixels/second
+        this.GRAVITY = 2500; // pixels/second/second
+        this.JUMP_SPEED = -650; // pixels/second (negative y is up)
         // Define platform constants
         this.INIT_GROUND = 30; // initial amount of ground blocks to generate
         this.INIT_HEIGHT = 3; // average height of blocks
@@ -51,7 +49,6 @@ BasicGame.GamePlay.prototype = {
         this.bullets = this.add.group();
         this.bullets.enableBody = true;
         this.firing = false;
-
         this.shoot = this.add.audio('shoot');
 
         // Create the player sprite
@@ -68,17 +65,19 @@ BasicGame.GamePlay.prototype = {
 
         // Play music
         this.music = this.add.audio('music');
-        this.music.play();
+        this.music.loopFull();
 
         // load the script
         this.script = JSON.parse(this.game.cache.getText('script'));
 
+        // load the sprites
         this.sydney = this.add.sprite(this.world.width - 25, 480, 'sydney');
         this.sydney.anchor.setTo(1, 1);
         this.sydney.visible = false;
         this.ravenna = this.add.sprite(25, 480, 'ravenna');
         this.ravenna.anchor.setTo(0, 1);
         this.ravenna.visible = false;
+
         // place the textbox (but keep it hidden)
         this.textbox = this.add.sprite(25, 480, 'key', 'textbox');
         this.textbox.visible = false;
@@ -89,12 +88,14 @@ BasicGame.GamePlay.prototype = {
 
         this.world.moveUp(this.sydney);
         this.world.moveUp(this.ravenna);
+
         // Start the first dialogue event
+        // There was a better way to have done all this but I wish I knew like a week ago
         textKey = Math.round(Math.random()); // start the script from either 0 or 1
         textLine = 0;
         charNum = 0;
         this.textRun = false;
-        this.game.time.events.add(1000, function(){this.textbox.visible = true, this.textRun = true}, this);
+        this.game.time.events.add(3000, function(){this.textbox.visible = true, this.textRun = true}, this);
         this.game.time.events.loop(this.DIALOGUE_TICK, this.unfoldDialogue, this, textKey, textLine, charNum);
 
         // Fire the bullets
@@ -102,18 +103,15 @@ BasicGame.GamePlay.prototype = {
     },
 
     update: function () {
-        // debug information
-        this.game.debug.text(this.time.fps || '--', 2, 14, "#00ff00");   
-
         // check for if player falls off the buildings
-        if(player.y > this.world.height - 50 || this.input.keyboard.isDown(Phaser.Keyboard.ENTER)){
+        if(player.y > this.world.height - 50){
             this.music.stop();
-            this.state.start('GameOver');
+            this.state.start('GameOver', score);
         }
         // if player gets caught by the popo
         if(player.x < 0){
             this.music.stop();
-            this.state.start('GameOver');
+            this.state.start('GameOver', score);
         }
         // check for death by bullets
         var bulletsActive = this.bullets.children.length;
@@ -126,7 +124,7 @@ BasicGame.GamePlay.prototype = {
                     if(bullet.y > miny && bullet.y <maxy){
                         if(this.physics.arcade.collide(player, bullet)){
                             this.music.stop();
-                            this.state.start('GameOver');
+                            this.state.start('GameOver', score);
                         }
                     }
                 }
