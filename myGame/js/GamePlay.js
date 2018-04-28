@@ -52,6 +52,8 @@ BasicGame.GamePlay.prototype = {
         this.bullets.enableBody = true;
         this.firing = false;
 
+        this.shoot = this.add.audio('shoot');
+
         // Create the player sprite
         this.createPlayer();
         // Start a particle emitter, for a cool fancy effect
@@ -71,15 +73,17 @@ BasicGame.GamePlay.prototype = {
         // load the script
         this.script = JSON.parse(this.game.cache.getText('script'));
 
-        this.sydney = this.add.sprite(0, 0, 'sydney');
+        this.sydney = this.add.sprite(this.world.width - 25, 480, 'sydney');
+        this.sydney.anchor.setTo(1, 1);
         this.sydney.visible = false;
-        this.ravenna = this.add.sprite(0, 0, 'ravenna');
+        this.ravenna = this.add.sprite(25, 480, 'ravenna');
+        this.ravenna.anchor.setTo(0, 1);
         this.ravenna.visible = false;
         // place the textbox (but keep it hidden)
-        this.textbox = this.add.sprite(25, 475, 'key', 'textbox');
+        this.textbox = this.add.sprite(25, 480, 'key', 'textbox');
         this.textbox.visible = false;
         // initialize the text
-        this.btmText = this.add.bitmapText(200, 500, 'btmfont', "", 24); // 24 is the fontSize
+        this.btmText = this.add.bitmapText(150, 500, 'btmfont', "", 24); // 24 is the fontSize
         this.btmText.maxWidth = 800;
         this.game.cache.getBitmapFont('btmfont').font.lineHeight = 30; // change line spacing in a more roundabout way
 
@@ -156,7 +160,7 @@ BasicGame.GamePlay.prototype = {
         }
 
         // Check for dialogue that you can unlock
-        // If I had more time I would have added more depth to these lines but well... rip
+        // If I had more time I would have added more depth to these lines
         if(this.textbox.visible == false && score > this.SCORE_GOAL){
             if(score > 400 && textKey < 2){
                 textKey = 2;
@@ -246,7 +250,7 @@ BasicGame.GamePlay.prototype = {
     createLight: function(){
         // This code is referenced from phaser.io "firestarter particles"
         this.emitter = this.add.emitter(this.world.centerX, this.world.centerY, 400);
-        this.emitter.makeParticles('key', 'light');
+        this.emitter.makeParticles('light');
         this.emitter.gravity = -50;
         this.emitter.setAlpha(1, 0, 500);
         this.emitter.setScale(0.8, .3, 0.8, .3, 800);
@@ -312,18 +316,16 @@ BasicGame.GamePlay.prototype = {
             // else clear textbox and end conversation
             }else{
                 this.textRun = true;
-                if(this.function == false){
-                    this.time.events.add(this.TEXTBOX_TIME, function(){
-                        this.textbox.visible = false;
-                        this.btmText.text = "";
-                        // evaluate the function from the dialogue if there is one
-                        if(line.function != undefined){
-                            eval(line.function);
-                        }
+                this.time.events.add(this.TEXTBOX_TIME, function(){
+                    this.textbox.visible = false;
+                    this.btmText.text = "";
+                    // evaluate the function from the dialogue if there is one
+                    if(line.function != undefined && this.function == false){
                         this.function = true;
-                        this.textRun = false;
-                    }, this);
-                }
+                        eval(line.function);
+                    }
+                    this.textRun = false;
+                }, this);
             }
             // show sprites
             this.ravenna.visible = (line.sprite == "ravenna"? true : false);
@@ -355,6 +357,7 @@ BasicGame.GamePlay.prototype = {
                 this.game.physics.arcade.enable(bullet);
                 bullet.body.velocity.x = 500;               
                 this.bullets.add(bullet);
+                this.shoot.play();
             }
         }
     },

@@ -13,6 +13,10 @@ BasicGame.GameOver.prototype = {
 	create: function() {
 		this.stage.backgroundColor = "#000";
 
+		// play sad game over tune
+		this.dead = this.add.audio('dead');
+		this.dead.play();
+
 		var rip = this.add.sprite(this.world.centerX, 0, 'key', 'gameover');
 		rip.anchor.setTo(0.5, 0);
 		rip.alpha = 0;

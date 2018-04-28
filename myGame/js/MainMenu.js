@@ -8,10 +8,13 @@ BasicGame.MainMenu.prototype = {
 		// preload sound
 		this.load.audio('music', 'assets/audio/tw061.mp3');
 		this.load.audio('siren', 'assets/audio/siren.ogg');
+		this.load.audio('shoot', 'assets/audio/344310__musiclegends__laser-shoot.wav');
+		this.load.audio('dead', 'assets/audio/133283__fins__game-over.wav');
 
 		// preload art
         this.load.atlas('key', 'assets/img/spritesheet.png', 'assets/img/sprites.json');
         this.load.image('block', 'assets/img/block.png');
+        this.load.image('light', 'assets/img/light.png');
         this.load.spritesheet('player', 'assets/img/player.png', 64, 64);
 
         this.load.image('sydney', 'assets/img/sydney_sprite.png');

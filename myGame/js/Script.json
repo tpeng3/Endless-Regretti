@@ -32,7 +32,7 @@
 		{"sprite":"ravenna","dialogue":"Well stubborness is a part of your charm."},
 		{"sprite":"sydney", "dialogue":"H-huh?"},
 		{"sprite":"ravenna", "dialogue":"What's the matter? Cat got your tongue?"},
-		{"sprite":"sydney", "dialogue":"N-no! My gun got stuck!", "function":"this.NUM_BULLETS = 2;"},
+		{"sprite":"sydney", "dialogue":"N-no! My gun got stuck!", "function":"this.NUM_BULLETS = 2;"}
 	],
 	[
 		{"sprite":"sydney", "dialogue":"You can't outrun justice!"},
@@ -55,8 +55,7 @@
 	[
 		{"sprite":"sydney", "dialogue":"W-what? There's a traffic accident on First Avenue?"},
 		{"sprite":"sydney", "dialogue":"Try another route! We can't let the thief get away!"},
-		{"sprite":"ravenna","dialogue":"Lucky me~ I can slow down.", "function":"this.slowdownWall();"},
-
+		{"sprite":"ravenna","dialogue":"Lucky me~ I can slow down.", "function":"this.slowdownWall();"}
 	],
 	[
 		{"sprite":"sydney", "dialogue":"Surrender and return what you stole immediately!"},
@@ -93,5 +92,5 @@
 	[
 		{"sprite":"sydney", "dialogue":"You're just delaying the inevitable."},
 		{"sprite":"ravenna","dialogue":"Even if you catch me, you can't hold me for long."}
-	],
+	]
 ]
