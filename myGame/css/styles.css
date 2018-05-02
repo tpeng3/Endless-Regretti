@@ -1,0 +1,8 @@
+body {
+	font-family: Helvetica;
+}
+
+canvas {
+	display: block;
+	margin : auto;
+}

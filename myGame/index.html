@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>Tina Peng</title>
+	<script src="../framework/phaser.min.js"></script>
+	<script src="js/MainMenu.js"></script>
+	<script src="js/GamePlay.js"></script>
+	<script src="js/GameOver.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+
+<body>
+<div id="gameContainer"></div>
+<body bgcolor="#ddd">
+<script type="text/javascript">
+
+window.onload = function() {
+	// Create your Phaser game and place it into the gameContainer div.
+	var game = new Phaser.Game(1000, 600, Phaser.AUTO, 'gameContainer');
+
+	// Add the states to the StateManager.
+	game.state.add('MainMenu', BasicGame.MainMenu);
+	game.state.add('GamePlay', BasicGame.GamePlay);
+	game.state.add('GameOver', BasicGame.GameOver);
+
+	// Now start the MainMenu state.
+	game.state.start('MainMenu');
+};
+
+</script>
+
+</body>
+</html>
