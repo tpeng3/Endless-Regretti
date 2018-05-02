@@ -1,4 +1,3 @@
-
 BasicGame.GameOver = function (game) {};
 
 BasicGame.GameOver.prototype = {
